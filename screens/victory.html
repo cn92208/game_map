@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>勝利結算</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:1280px;height:800px;overflow:hidden;display:flex;}
+  .bg{position:absolute;inset:0;}
+  .bg img{width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.5;}
+  .bg .veil{position:absolute;inset:0;background:
+    linear-gradient(90deg,rgba(8,5,18,.94) 30%,rgba(8,5,18,.55) 58%,rgba(8,5,18,.9)),
+    radial-gradient(80% 70% at 30% 120%,rgba(244,217,133,.12),transparent 60%);}
+  .rays{position:absolute;left:24%;top:50%;transform:translate(-50%,-50%);width:760px;height:760px;border-radius:50%;
+    background:conic-gradient(from 0deg,transparent,rgba(244,217,133,.07) 6%,transparent 12%,transparent 50%,rgba(244,217,133,.07) 56%,transparent 62%);
+    animation:spin 60s linear infinite;}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+
+  /* winner */
+  .winner{position:relative;z-index:3;width:560px;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;}
+  .winner .eyebrow{font-size:12px;}
+  .winner .vtitle{font-family:var(--serif);font-weight:900;font-size:52px;margin-top:6px;line-height:1;}
+  .crown{font-size:40px;filter:drop-shadow(0 4px 10px rgba(244,217,133,.6));margin-bottom:-6px;animation:bobf 3s ease-in-out infinite;}
+  @keyframes bobf{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+  .dais{position:relative;margin-top:18px;width:280px;height:280px;display:grid;place-items:center;}
+  .dais .tk{width:248px;height:248px;object-fit:contain;filter:drop-shadow(0 24px 26px rgba(0,0,0,.7)) drop-shadow(0 0 46px rgba(255,106,61,.45));}
+  .dais .halo{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,106,61,.32),transparent 62%);z-index:-1;}
+  .dais .floor{position:absolute;bottom:8px;width:230px;height:36px;border-radius:50%;background:radial-gradient(ellipse,rgba(244,217,133,.4),transparent 70%);filter:blur(4px);}
+  .winner .wname{font-family:var(--serif);font-weight:900;font-size:34px;color:var(--ink);margin-top:6px;}
+  .winner .warch{font-size:13px;color:var(--ink-dim);margin-top:2px;}
+  .winner .wworth{margin-top:16px;text-align:center;}
+  .winner .wworth .wl{font-family:var(--display);font-size:10px;letter-spacing:.32em;color:var(--gold-3);}
+  .winner .wworth .wv{font-family:var(--display);font-weight:700;font-size:46px;color:transparent;
+    background:linear-gradient(176deg,var(--gold-1),var(--gold-3));-webkit-background-clip:text;background-clip:text;margin-top:2px;}
+
+  /* ranking */
+  .ranks{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 48px 48px 12px;gap:13px;}
+  .ranks .rh{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .ranks .rh .eyebrow{white-space:nowrap;}
+  .ranks .rh .rule-gold{flex:1;}
+  .rrow{display:flex;align-items:center;gap:15px;padding:14px 18px;position:relative;overflow:hidden;}
+  .rrow .medal{font-family:var(--display);font-weight:700;font-size:22px;width:38px;text-align:center;flex:0 0 auto;color:var(--ink-dim);}
+  .rrow.r1 .medal,.rrow.r2 .medal,.rrow.r3 .medal{font-size:26px;}
+  .rrow img{width:54px;height:54px;object-fit:contain;border-radius:50%;border:2px solid var(--pc);flex:0 0 auto;
+    background:rgba(12,8,26,.6);filter:drop-shadow(0 2px 4px #000);}
+  .rrow .ri{flex:1;min-width:0;}
+  .rrow .ri .n{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);}
+  .rrow .ri .a{font-size:11px;color:var(--ink-dim);margin-top:1px;}
+  .rrow .ri .bar{height:5px;border-radius:3px;margin-top:7px;background:linear-gradient(90deg,var(--pc),transparent);}
+  .rrow .breakdown{text-align:right;flex:0 0 auto;}
+  .rrow .breakdown .tot{font-family:var(--display);font-weight:700;font-size:23px;color:var(--gold-2);}
+  .rrow .breakdown .sub{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
+  .rrow.r1{border-color:var(--gold-2);box-shadow:0 0 28px -8px var(--gold-glow),inset 0 1px 0 rgba(255,255,255,.08);}
+  .rrow.r1::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(244,217,133,.12),transparent 50%);pointer-events:none;}
+  .rrow.bankrupt{opacity:.5;}
+  .endbtns{display:flex;gap:13px;margin-top:14px;}
+  .endbtns .btn{flex:1;}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="勝利結算">
+  <div class="bg"><img src="../images/hero_paladin.png" alt=""><div class="veil"></div></div>
+  <div class="rays"></div>
+
+  <div class="winner">
+    <div class="crown">👑</div>
+    <div class="eyebrow">Victor&nbsp;of&nbsp;Ilumiya</div>
+    <div class="vtitle title-zh">王國的勝者</div>
+    <div class="dais">
+      <div class="halo"></div>
+      <img class="tk" src="../images/q_paladin.png" alt="">
+      <div class="floor"></div>
+    </div>
+    <div class="wname">凱爾</div>
+    <div class="warch">⚔️ 聖焰騎士 · 以誓言守護王國的秩序</div>
+    <div class="wworth"><div class="wl">TOTAL&nbsp;NET&nbsp;WORTH</div><div class="wv">38,400 ✦</div></div>
+  </div>
+
+  <div class="ranks">
+    <div class="rh"><span class="eyebrow">Final&nbsp;Standings&nbsp;·&nbsp;第&nbsp;12&nbsp;回合落幕</span><hr class="rule-gold"></div>
+
+    <div class="rrow r1 panel" style="--pc:var(--fire)">
+      <span class="medal">🥇</span>
+      <img src="../images/q_paladin.png">
+      <div class="ri"><div class="n">凱爾</div><div class="a">聖焰騎士 · 7 處領地</div><div class="bar" style="width:100%"></div></div>
+      <div class="breakdown"><div class="tot">38,400 ✦</div><div class="sub">現金 21.8k · 領地 14.6k · 股票 2.0k</div></div>
+    </div>
+
+    <div class="rrow r2 panel" style="--pc:var(--shadow)">
+      <span class="medal">🥈</span>
+      <img src="../images/q_mage.png">
+      <div class="ri"><div class="n">星辰</div><div class="a">元素法師 · 5 處領地</div><div class="bar" style="width:74%"></div></div>
+      <div class="breakdown"><div class="tot">28,250 ✦</div><div class="sub">現金 14.2k · 領地 11.1k · 股票 2.9k</div></div>
+    </div>
+
+    <div class="rrow r3 panel" style="--pc:var(--giant)">
+      <span class="medal">🥉</span>
+      <img src="../images/q_engineer.png">
+      <div class="ri"><div class="n">格倫</div><div class="a">蒸汽工匠 · 4 處領地</div><div class="bar" style="width:52%"></div></div>
+      <div class="breakdown"><div class="tot">19,600 ✦</div><div class="sub">現金 12.4k · 領地 7.2k</div></div>
+    </div>
+
+    <div class="rrow bankrupt panel" style="--pc:var(--enchanted)">
+      <span class="medal">4</span>
+      <img src="../images/q_druid.png">
+      <div class="ri"><div class="n">薇拉 <span style="font-size:11px;color:var(--loss)">· 破產</span></div><div class="a">翠林德魯伊 · 領地遭清算</div><div class="bar" style="width:14%"></div></div>
+      <div class="breakdown"><div class="tot" style="color:var(--ink-faint)">0 ✦</div><div class="sub">於第 9 回合破產出局</div></div>
+    </div>
+
+    <div class="endbtns">
+      <button class="btn btn-gold">再戰一場 ⚔</button>
+      <button class="btn btn-ghost">返回大廳</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

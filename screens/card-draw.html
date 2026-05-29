@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>命運神諭</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:600px;height:800px;overflow:hidden;display:grid;place-items:center;}
+  .arcane{position:absolute;inset:0;}
+  .arcane::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:540px;height:540px;border-radius:50%;border:1px solid rgba(157,107,230,.3);
+    box-shadow:0 0 80px rgba(157,107,230,.25),inset 0 0 60px rgba(157,107,230,.15);}
+  .arcane::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(18deg);
+    width:420px;height:420px;border-radius:50%;border:1px dashed rgba(231,193,107,.28);}
+  .glowrune{position:absolute;font-family:var(--display);color:rgba(180,140,255,.5);font-size:20px;text-shadow:0 0 12px rgba(157,107,230,.7);}
+
+  .stack{position:relative;z-index:3;width:100%;display:flex;flex-direction:column;align-items:center;padding:0 40px;}
+  .ribbon{font-family:var(--serif);font-weight:900;font-size:13px;letter-spacing:.5em;color:var(--gold-2);
+    text-transform:none;margin-bottom:4px;}
+  .eyebrow.dt{color:var(--shadow);}
+
+  /* peeking back card */
+  .back-peek{position:absolute;top:78px;width:286px;height:402px;border-radius:18px;overflow:hidden;
+    transform:rotate(-7deg) translateX(-30px);opacity:.5;border:1px solid var(--gold-line);filter:blur(.4px);}
+  .back-peek img{width:100%;height:100%;object-fit:cover;}
+
+  /* main card */
+  .card{position:relative;width:300px;border-radius:20px;overflow:hidden;
+    border:1.5px solid var(--gold-line);
+    box-shadow:0 40px 80px -20px #000,0 0 60px rgba(157,107,230,.4),inset 0 0 0 1px rgba(231,193,107,.12);
+    animation:rise .6s cubic-bezier(.2,.8,.2,1);}
+  @keyframes rise{from{transform:translateY(40px) scale(.94);opacity:0;}to{transform:none;opacity:1;}}
+  .card .top{position:relative;height:236px;overflow:hidden;}
+  .card .top img{width:100%;height:100%;object-fit:cover;object-position:center 22%;}
+  .card .top .seal{position:absolute;left:50%;bottom:-34px;transform:translateX(-50%);z-index:4;
+    width:78px;height:78px;border-radius:50%;display:grid;place-items:center;font-size:38px;
+    background:radial-gradient(circle at 50% 35%,#2c2152,#120c2c);border:2px solid var(--gold-2);
+    box-shadow:0 8px 22px rgba(0,0,0,.6),0 0 26px rgba(244,217,133,.4);}
+  .card .top .grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(18,12,38,.95));}
+  .card .top .kicker{position:absolute;top:14px;left:0;right:0;text-align:center;}
+  .card .top .kicker .k{font-family:var(--serif);font-weight:900;font-size:21px;color:#fff;text-shadow:0 2px 12px #000,0 0 18px rgba(157,107,230,.8);}
+  .card .top .kicker .ke{font-family:var(--display);font-size:9.5px;letter-spacing:.4em;color:var(--gold-2);margin-top:2px;}
+  .card .body{background:linear-gradient(180deg,#1a1338,#120c2c);padding:50px 26px 26px;text-align:center;}
+  .card .body .txt{font-family:var(--serif);font-size:18px;line-height:1.65;color:var(--ink);}
+  .card .body .reward{margin-top:16px;font-family:var(--display);font-weight:700;font-size:26px;}
+  .card .body .reward.g{color:var(--gain);} .card .body .reward.l{color:var(--loss);}
+  .card .body .rule-gold{margin:16px 0 0;}
+  .corner-fl{position:absolute;width:22px;height:22px;border:1.5px solid var(--gold-2);z-index:5;opacity:.9;}
+  .cf1{top:9px;left:9px;border-right:0;border-bottom:0;border-radius:7px 0 0 0;}
+  .cf2{top:9px;right:9px;border-left:0;border-bottom:0;border-radius:0 7px 0 0;}
+  .cf3{bottom:9px;left:9px;border-right:0;border-top:0;border-radius:0 0 0 7px;}
+  .cf4{bottom:9px;right:9px;border-left:0;border-top:0;border-radius:0 0 7px 0;}
+
+  .confirm{margin-top:30px;z-index:3;}
+  .confirm .btn{padding:15px 56px;font-size:17px;}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="命運抽卡">
+  <div class="arcane">
+    <span class="glowrune" style="left:14%;top:18%">✦</span>
+    <span class="glowrune" style="right:16%;top:24%">❂</span>
+    <span class="glowrune" style="left:20%;bottom:20%">✧</span>
+    <span class="glowrune" style="right:18%;bottom:24%">⟡</span>
+    <span class="glowrune" style="left:50%;top:8%">✶</span>
+  </div>
+
+  <div class="stack">
+    <div class="ribbon">命 運 神 諭</div>
+    <div class="eyebrow dt" style="margin-bottom:30px">Oracle&nbsp;of&nbsp;Destiny</div>
+
+    <div style="position:relative;display:grid;place-items:center;">
+      <div class="back-peek"><img src="../images/chance_card_back.png" alt=""></div>
+      <div class="card">
+        <span class="corner-fl cf1"></span><span class="corner-fl cf2"></span>
+        <span class="corner-fl cf3"></span><span class="corner-fl cf4"></span>
+        <div class="top">
+          <img src="../images/destiny_card_back.png" alt="">
+          <div class="grad"></div>
+          <div class="kicker"><div class="k">命運神殿</div><div class="ke">DESTINY&nbsp;·&nbsp;ILUMIYA</div></div>
+          <div class="seal">🗡️</div>
+        </div>
+        <div class="body">
+          <div class="txt">你在上古遺跡中發掘出<br>失落的<b style="color:var(--gold-2)">傳說神器</b></div>
+          <div class="reward g">+ 3,000 <span class="coin" style="font-size:20px"></span></div>
+          <hr class="rule-gold">
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm"><button class="btn btn-gold">接受命運的裁奪</button></div>
+  </div>
+</div>
+</body>
+</html>

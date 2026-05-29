@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>手機版</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:420px;height:860px;overflow:hidden;display:flex;flex-direction:column;}
+  /* top bar */
+  .topbar{flex:0 0 auto;padding:12px 13px 10px;display:flex;flex-direction:column;gap:9px;position:relative;z-index:5;}
+  .tb-head{display:flex;align-items:center;justify-content:space-between;}
+  .tb-head .brand{font-family:var(--serif);font-weight:900;font-size:17px;}
+  .tb-head .round{font-family:var(--display);font-size:10px;letter-spacing:.16em;color:var(--gold-2);
+    border:1px solid var(--gold-line);border-radius:999px;padding:3px 11px;background:rgba(12,8,26,.5);}
+  .pstrip{display:flex;gap:8px;}
+  .pc{flex:1;display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:11px;min-width:0;
+    background:rgba(20,14,42,.6);border:1px solid rgba(231,193,107,.12);position:relative;}
+  .pc.active{background:linear-gradient(120deg,rgba(244,217,133,.16),rgba(244,217,133,.02));border-color:var(--gold-line);
+    box-shadow:0 0 16px -5px var(--gold-glow);}
+  .pc img{width:30px;height:30px;border-radius:50%;object-fit:contain;border:1.5px solid var(--pc);flex:0 0 auto;
+    background:rgba(12,8,26,.6);filter:drop-shadow(0 1px 2px #000);}
+  .pc .pi{min-width:0;}
+  .pc .pi .n{font-family:var(--serif);font-weight:700;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);}
+  .pc .pi .m{font-family:var(--display);font-size:10px;color:var(--gold-2);}
+  .pc.jail::after{content:'⛓';position:absolute;top:3px;right:5px;font-size:9px;}
+
+  /* board */
+  .board-area{flex:1;display:grid;place-items:center;padding:6px 11px;min-height:0;}
+  .board{width:396px;height:396px;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);
+    gap:2.5px;padding:7px;border-radius:18px;border:1px solid var(--gold-line);
+    background:linear-gradient(150deg,rgba(40,30,72,.6),rgba(14,10,30,.75));
+    box-shadow:0 20px 50px -20px #000,inset 0 0 60px rgba(8,4,20,.6);}
+  .map{grid-column:2/11;grid-row:2/11;position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--gold-line);
+    box-shadow:inset 0 0 0 3px rgba(10,6,24,.5);}
+  .map img{width:100%;height:100%;object-fit:cover;opacity:.95;}
+  .map .veil{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,transparent 38%,rgba(8,4,20,.6));}
+  .map .crest{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;}
+  .map .crest .ring{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;
+    border:1px solid var(--gold-line);background:radial-gradient(circle,rgba(12,8,26,.7),transparent 72%);}
+  .map .crest h1{font-size:19px;line-height:1.1;}
+  .map .crest .sub{font-size:6.5px;margin-top:3px;}
+
+  .tile{position:relative;border-radius:5px;overflow:hidden;background:#140f2b;border:1px solid rgba(231,193,107,.12);}
+  .tile .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .tile .tb{position:absolute;top:0;left:0;right:0;height:3px;z-index:3;}
+  .tile.medallion{background:radial-gradient(circle at 50% 38%,#2a2150,#120c2c);display:grid;place-items:center;}
+  .tile.medallion .glyph{font-size:13px;filter:drop-shadow(0 1px 2px #000);}
+  .tile.owned{box-shadow:inset 0 0 0 1.5px var(--own);}
+  .tile .og{position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;border:1px solid #fff;z-index:4;}
+  .tile.here{box-shadow:inset 0 0 0 2px var(--gold-2),0 0 12px -2px var(--gold-glow);}
+  .tile .tok{position:absolute;bottom:1px;left:0;right:0;z-index:5;display:flex;justify-content:center;}
+  .tile .tok img{width:15px;height:15px;object-fit:contain;filter:drop-shadow(0 1px 2px #000);}
+  .tile .tok img.active{filter:drop-shadow(0 0 4px var(--gold-2)) drop-shadow(0 1px 2px #000);}
+
+  /* bottom dock */
+  .dock{flex:0 0 auto;padding:11px 13px 16px;display:flex;flex-direction:column;gap:11px;position:relative;z-index:5;}
+  .tilestrip{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:13px;}
+  .tilestrip .ic{width:42px;height:42px;border-radius:9px;overflow:hidden;flex:0 0 auto;position:relative;border:1px solid var(--gold-line);}
+  .tilestrip .ic img{width:100%;height:100%;object-fit:cover;}
+  .tilestrip .ic .b{position:absolute;top:0;left:0;right:0;height:3px;}
+  .tilestrip .ti{flex:1;min-width:0;}
+  .tilestrip .ti .r{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ink-dim);}
+  .tilestrip .ti .n{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--ink);margin-top:1px;}
+  .tilestrip .rent{text-align:right;}
+  .tilestrip .rent .rl{font-family:var(--display);font-size:8px;letter-spacing:.18em;color:var(--ink-faint);}
+  .tilestrip .rent .rv{font-family:var(--display);font-weight:700;font-size:16px;color:var(--gold-2);}
+
+  .castrow{display:flex;align-items:center;gap:14px;}
+  .dice-pair{display:flex;gap:8px;}
+  .die{width:40px;height:40px;border-radius:9px;position:relative;background:linear-gradient(150deg,#fbf3df,#e6d3a6);
+    box-shadow:0 5px 12px rgba(0,0,0,.5),inset 0 2px 2px rgba(255,255,255,.7),inset 0 -3px 4px rgba(150,110,40,.35);}
+  .die i{position:absolute;width:7px;height:7px;border-radius:50%;transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 35% 30%,#4a2f12,#1c1106);}
+  .castrow .btn{flex:1;}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="手機版主畫面">
+  <div class="topbar">
+    <div class="tb-head">
+      <div class="brand title-zh">奇幻大富翁</div>
+      <div class="round">第 7 回合</div>
+    </div>
+    <div class="pstrip">
+      <div class="pc active" style="--pc:var(--shadow)"><img src="../images/q_mage.png"><div class="pi"><div class="n">星辰</div><div class="m">14.2k ✦</div></div></div>
+      <div class="pc" style="--pc:var(--fire)"><img src="../images/q_paladin.png"><div class="pi"><div class="n">凱爾</div><div class="m">21.8k ✦</div></div></div>
+      <div class="pc jail" style="--pc:var(--enchanted)"><img src="../images/q_druid.png"><div class="pi"><div class="n">薇拉</div><div class="m">9.6k ✦</div></div></div>
+    </div>
+  </div>
+
+  <div class="board-area">
+    <div class="board" id="board">
+      <div class="map">
+        <img src="../images/background_map.png" alt="">
+        <div class="veil"></div>
+        <div class="crest"><div class="ring"><h1 class="title-zh">伊路<br>米雅</h1></div><div class="sub eyebrow">ILUMIYA</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <div class="tilestrip panel flourish">
+      <div class="ic"><span class="b" style="background:var(--crystal)"></span><img src="../images/tile_property.png"></div>
+      <div class="ti">
+        <div class="r"><span class="gem" style="color:var(--crystal);background:var(--crystal)"></span> 水晶洞窟 · 無人擁有</div>
+        <div class="n">水晶洞穴</div>
+      </div>
+      <div class="rent"><div class="rl">售價</div><div class="rv">1,800</div></div>
+    </div>
+    <div class="castrow">
+      <div class="dice-pair"><div class="die" data-v="4"></div><div class="die" data-v="3"></div></div>
+      <button class="btn btn-gold">購買領地 ✦</button>
+      <button class="btn btn-ghost btn-sm" style="flex:0 0 auto">結束</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BOARD=[
+ {t:'special',glyph:'🏰'},{t:'property',g:'enchanted'},{t:'chance',img:'tile_chance'},{t:'property',g:'enchanted'},{t:'property',g:'enchanted'},
+ {t:'tax',glyph:'💎'},{t:'transport',img:'tile_railway'},{t:'property',g:'shadow'},{t:'destiny',img:'tile_destiny'},{t:'property',g:'shadow'},
+ {t:'special',glyph:'🐉'},{t:'curse',glyph:'💀'},{t:'property',g:'fire'},{t:'minigame',glyph:'⚔️'},{t:'property',g:'fire'},
+ {t:'chance',img:'tile_chance'},{t:'property',g:'fire'},{t:'stock',glyph:'📈'},{t:'property',g:'crystal',here:1},{t:'tavern',glyph:'🍺'},
+ {t:'property',g:'crystal'},{t:'free',glyph:'⛲'},{t:'property',g:'giant'},{t:'destiny',img:'tile_destiny'},{t:'property',g:'giant'},
+ {t:'shop',glyph:'🏪'},{t:'auction',glyph:'🔔'},{t:'property',g:'frost'},{t:'transport',img:'tile_railway'},{t:'property',g:'frost'},
+ {t:'minigame',glyph:'⚔️'},{t:'special',glyph:'🪤'},{t:'property',g:'sacred'},{t:'chance',img:'tile_chance'},{t:'property',g:'sacred'},
+ {t:'property',g:'storm'},{t:'shop',glyph:'🏪'},{t:'transport',img:'tile_railway'},{t:'property',g:'storm'},{t:'property',g:'ancient'}
+];
+const OWN={1:{c:'enchanted'},3:{c:'enchanted'},7:{c:'shadow'},14:{c:'fire'},22:{c:'giant'},27:{c:'frost'},34:{c:'sacred'},39:{c:'ancient'}};
+const TOK={18:[{img:'q_mage',a:1}],10:[{img:'q_druid'}],3:[{img:'q_paladin'}]};
+function gpos(i){if(i<=10)return{c:i+1,r:1};if(i<=20)return{c:11,r:i-10+1};if(i<=30)return{c:30-i+1,r:11};return{c:1,r:40-i+1};}
+const board=document.getElementById('board');
+BOARD.forEach((sp,i)=>{
+  const p=gpos(i),el=document.createElement('div');
+  el.className='tile'+(sp.here?' here':'');el.style.gridColumn=p.c;el.style.gridRow=p.r;
+  const art=sp.t==='property'||sp.t==='transport'||sp.t==='chance'||sp.t==='destiny';let h='';
+  if(art){h+=`<img class="art" src="../images/${sp.img||'tile_property'}.png">`;if(sp.g)h+=`<span class="tb" style="background:var(--${sp.g})"></span>`;}
+  else{el.classList.add('medallion');h+=`<div class="glyph">${sp.glyph||'✦'}</div>`;}
+  if(OWN[i]){el.classList.add('owned');el.style.setProperty('--own',`var(--${OWN[i].c})`);h+=`<span class="og" style="background:var(--${OWN[i].c})"></span>`;}
+  if(TOK[i])h+=`<div class="tok">`+TOK[i].map(t=>`<img class="${t.a?'active':''}" src="../images/${t.img}.png">`).join('')+`</div>`;
+  el.innerHTML=h;board.appendChild(el);
+});
+const PIP={1:[[50,50]],2:[[28,28],[72,72]],3:[[26,26],[50,50],[74,74]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[26,26],[74,26],[50,50],[26,74],[74,74]],6:[[28,24],[72,24],[28,50],[72,50],[28,76],[72,76]]};
+document.querySelectorAll('.die').forEach(d=>{PIP[+d.dataset.v].forEach(([x,y])=>{const i=document.createElement('i');i.style.left=x+'%';i.style.top=y+'%';d.appendChild(i);});});
+</script>
+</body>
+</html>

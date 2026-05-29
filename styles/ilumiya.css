@@ -1,0 +1,155 @@
+/* ============================================================
+   ILUMIYA · 奇幻大富翁 — Shared Visual System
+   Mood: 華麗厚重 — midnight indigo, gold filigree, gemstone accents
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+:root{
+  /* base void */
+  --void-0:#06040f;
+  --void-1:#0c0a1f;
+  --void-2:#171231;
+  --void-3:#241a48;
+  --ink:#ece3cf;
+  --ink-dim:#b3a7cf;
+  --ink-faint:#7d72a0;
+
+  /* regal gold */
+  --gold-1:#fdf1c4;
+  --gold-2:#f4d985;
+  --gold-3:#d9ad55;
+  --gold-4:#a9781f;
+  --gold-line:rgba(231,193,107,0.55);
+  --gold-glow:rgba(244,217,133,0.30);
+
+  /* gem region palette */
+  --enchanted:#3fcf7a;
+  --shadow:#9d6be6;
+  --fire:#ff6a3d;
+  --crystal:#46b6ec;
+  --giant:#e8983e;
+  --frost:#54dccb;
+  --sacred:#f6cc4c;
+  --storm:#b574f2;
+  --ancient:#dd6a2a;
+
+  --gain:#46d98a;
+  --loss:#ff6b6b;
+
+  --panel:linear-gradient(155deg, rgba(40,30,72,0.86), rgba(18,13,38,0.92));
+  --radius:16px;
+  --serif:'Noto Serif TC',serif;
+  --sans:'Noto Sans TC',sans-serif;
+  --display:'Cinzel',serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:
+    radial-gradient(120% 95% at 50% -10%, #2a1d52 0%, #15102e 45%, #0a0719 100%);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+/* faint starfield + arcane vignette layer */
+.void-bg::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(1.5px 1.5px at 18% 24%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1.5px 1.5px at 72% 12%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 42% 62%, rgba(255,255,255,.35), transparent),
+    radial-gradient(1.5px 1.5px at 88% 48%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 30% 82%, rgba(255,255,255,.3), transparent),
+    radial-gradient(2px 2px at 60% 30%, rgba(214,196,255,.45), transparent);
+  opacity:.8;
+}
+.void-bg::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 220px 40px rgba(4,2,12,0.9);
+}
+
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.2);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold-3),var(--gold-4));border-radius:8px;}
+
+/* ---------- Typography ---------- */
+.t-display{font-family:var(--display);font-weight:800;letter-spacing:.14em;text-transform:uppercase;}
+.t-serif{font-family:var(--serif);}
+.title-zh{
+  font-family:var(--serif);font-weight:900;color:transparent;
+  background:linear-gradient(176deg,var(--gold-1),var(--gold-2) 42%,var(--gold-3) 70%,var(--gold-4));
+  -webkit-background-clip:text;background-clip:text;
+  text-shadow:0 2px 16px rgba(244,217,133,.18);
+}
+.eyebrow{
+  font-family:var(--display);font-weight:600;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--gold-3);font-size:11px;
+}
+.gold{color:var(--gold-2);}
+.dim{color:var(--ink-dim);}
+.faint{color:var(--ink-faint);}
+
+/* ---------- Panels & filigree ---------- */
+.panel{
+  position:relative;background:var(--panel);
+  border:1px solid var(--gold-line);
+  border-radius:var(--radius);
+  box-shadow:
+    0 18px 48px -16px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 0 0 1px rgba(231,193,107,.08);
+  backdrop-filter:blur(8px);
+}
+/* corner flourishes */
+.panel.flourish::before,
+.panel.flourish::after{
+  content:'';position:absolute;width:18px;height:18px;pointer-events:none;
+  border:1.5px solid var(--gold-3);opacity:.85;
+}
+.panel.flourish::before{top:7px;left:7px;border-right:none;border-bottom:none;border-radius:6px 0 0 0;}
+.panel.flourish::after{bottom:7px;right:7px;border-left:none;border-top:none;border-radius:0 0 6px 0;}
+
+.rule-gold{
+  height:1px;border:none;
+  background:linear-gradient(90deg,transparent,var(--gold-line) 18%,var(--gold-2) 50%,var(--gold-line) 82%,transparent);
+}
+.diamond{display:inline-block;width:7px;height:7px;transform:rotate(45deg);
+  background:linear-gradient(135deg,var(--gold-1),var(--gold-3));box-shadow:0 0 8px var(--gold-glow);}
+
+/* ---------- Buttons ---------- */
+.btn{
+  font-family:var(--serif);font-weight:700;cursor:pointer;border:none;
+  border-radius:13px;padding:14px 30px;font-size:16px;position:relative;
+  transition:transform .15s, box-shadow .25s, filter .2s;letter-spacing:.05em;
+}
+.btn-gold{
+  color:#2a1c05;
+  background:linear-gradient(176deg,var(--gold-1),var(--gold-2) 45%,var(--gold-3) 72%,var(--gold-4));
+  box-shadow:0 10px 26px -8px rgba(217,173,85,.6), inset 0 1px 0 rgba(255,255,255,.7), inset 0 -2px 4px rgba(120,80,10,.4);
+  text-shadow:0 1px 0 rgba(255,247,210,.6);
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 34px -8px rgba(217,173,85,.75), inset 0 1px 0 rgba(255,255,255,.8);}
+.btn-ghost{
+  color:var(--gold-2);background:linear-gradient(155deg,rgba(48,36,82,.7),rgba(24,17,46,.8));
+  border:1px solid var(--gold-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.btn-ghost:hover{transform:translateY(-2px);color:var(--gold-1);box-shadow:0 0 18px -2px var(--gold-glow);}
+.btn-emerald{color:#04210f;background:linear-gradient(176deg,#9bf0bf,#46d98a 55%,#1f9d5e);box-shadow:0 10px 24px -8px rgba(70,217,138,.55),inset 0 1px 0 rgba(255,255,255,.6);}
+.btn-ruby{color:#2a0808;background:linear-gradient(176deg,#ffb0a3,#ff6b6b 55%,#c0392b);box-shadow:0 10px 24px -8px rgba(255,107,107,.5),inset 0 1px 0 rgba(255,255,255,.5);}
+.btn-sm{padding:9px 18px;font-size:13.5px;border-radius:10px;}
+
+/* ---------- Coin ---------- */
+.coin{
+  display:inline-grid;place-items:center;width:1.05em;height:1.05em;border-radius:50%;
+  font-size:.78em;font-weight:900;color:#6b4a06;vertical-align:-1px;
+  background:radial-gradient(circle at 38% 32%,var(--gold-1),var(--gold-3) 70%,var(--gold-4));
+  box-shadow:inset 0 0 0 1px rgba(120,80,10,.5),0 1px 2px rgba(0,0,0,.5);
+}
+.coin::before{content:'✦';}
+.amount{font-family:var(--display);font-weight:700;color:var(--gold-2);letter-spacing:.02em;}
+
+/* ---------- Gem chip (region marker) ---------- */
+.gem{width:11px;height:11px;border-radius:3px;transform:rotate(45deg);display:inline-block;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 0 8px currentColor;}

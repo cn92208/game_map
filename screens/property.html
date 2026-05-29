@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>領地契約</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:600px;height:800px;overflow:hidden;display:grid;place-items:center;padding:30px;}
+  .glow-floor{position:absolute;left:50%;bottom:60px;transform:translateX(-50%);width:380px;height:60px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(70,182,236,.3),transparent 70%);filter:blur(6px);}
+
+  .deed{position:relative;z-index:3;width:430px;border-radius:22px;overflow:hidden;
+    box-shadow:0 44px 90px -24px #000,0 0 60px rgba(70,182,236,.25);
+    animation:rise .5s cubic-bezier(.2,.8,.2,1);}
+  @keyframes rise{from{transform:translateY(34px);opacity:0;}to{transform:none;opacity:1;}}
+
+  .hero{position:relative;height:230px;overflow:hidden;border-bottom:1px solid var(--gold-line);}
+  .hero img{width:100%;height:100%;object-fit:cover;object-position:center 38%;}
+  .hero .reg-bar{position:absolute;top:0;left:0;right:0;height:6px;background:var(--crystal);}
+  .hero .grad{position:absolute;inset:0;background:linear-gradient(105deg,rgba(10,7,24,.7),transparent 45%),linear-gradient(to top,rgba(10,7,24,.92),transparent 55%);}
+  .hero .heading{position:absolute;left:22px;right:22px;bottom:14px;}
+  .hero .heading .reg{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-dim);}
+  .hero .heading h2{font-family:var(--serif);font-weight:900;font-size:32px;color:#fff;text-shadow:0 3px 14px #000;margin-top:2px;}
+  .hero .heading .en{font-family:var(--display);font-size:10px;letter-spacing:.3em;color:var(--gold-2);text-transform:uppercase;margin-top:3px;}
+  .hero .pricetag{position:absolute;top:18px;right:18px;text-align:right;padding:8px 14px;border-radius:12px;
+    background:rgba(10,7,24,.7);border:1px solid var(--gold-line);backdrop-filter:blur(4px);}
+  .hero .pricetag .pl{font-family:var(--display);font-size:8.5px;letter-spacing:.28em;color:var(--ink-dim);}
+  .hero .pricetag .pv{font-family:var(--display);font-weight:700;font-size:22px;color:var(--gold-2);}
+
+  .deed .body{background:linear-gradient(180deg,#191234,#120c2a);padding:18px 22px 22px;}
+  .deed .body .sech{font-family:var(--display);font-size:10px;letter-spacing:.32em;color:var(--gold-3);margin-bottom:8px;}
+  /* rent ladder */
+  .ladder{display:flex;flex-direction:column;gap:0;border:1px solid var(--gold-line);border-radius:12px;overflow:hidden;}
+  .rl{display:flex;align-items:center;gap:11px;padding:9px 13px;border-top:1px solid rgba(231,193,107,.1);}
+  .rl:first-child{border-top:none;}
+  .rl .lv{display:flex;gap:2px;width:64px;flex:0 0 auto;}
+  .rl .lv .h{font-size:13px;filter:saturate(.4) brightness(.9);}
+  .rl .lv .h.on{filter:none;}
+  .rl .nm{flex:1;font-size:13px;color:var(--ink-dim);}
+  .rl .v{font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink-dim);}
+  .rl.cur{background:rgba(70,182,236,.1);}
+  .rl.cur .nm{color:var(--crystal);font-weight:700;} .rl.cur .v{color:var(--gold-2);}
+
+  .meta-row{display:flex;gap:10px;margin-top:14px;}
+  .mbox{flex:1;text-align:center;padding:10px 6px;}
+  .mbox .ml{font-family:var(--display);font-size:8.5px;letter-spacing:.2em;color:var(--ink-faint);}
+  .mbox .mv{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold-2);margin-top:3px;}
+
+  .actions{display:flex;gap:11px;margin-top:18px;}
+  .actions .btn{flex:1;}
+  .wallet{text-align:center;margin-top:13px;font-size:12px;color:var(--ink-dim);}
+  .wallet b{color:var(--gold-2);font-family:var(--display);}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="房產購買">
+  <div class="glow-floor"></div>
+  <div class="deed panel flourish">
+    <div class="hero">
+      <span class="reg-bar"></span>
+      <img src="../images/tile_property.png" alt="">
+      <div class="grad"></div>
+      <div class="pricetag"><div class="pl">PURCHASE</div><div class="pv">1,800 ✦</div></div>
+      <div class="heading">
+        <div class="reg"><span class="gem" style="color:var(--crystal);background:var(--crystal)"></span> 水晶洞窟 · 待開發的寶地</div>
+        <h2>水晶洞穴</h2>
+        <div class="en">Crystal&nbsp;Caverns</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="sech">RENT&nbsp;·&nbsp;租金階梯</div>
+      <div class="ladder">
+        <div class="rl cur"><span class="lv"></span><span class="nm">空地 · 基本租金 ◂</span><span class="v">90 ✦</span></div>
+        <div class="rl"><span class="lv"><span class="h on">🏠</span></span><span class="nm">一級建築</span><span class="v">250 ✦</span></div>
+        <div class="rl"><span class="lv"><span class="h on">🏠</span><span class="h on">🏠</span></span><span class="nm">二級建築</span><span class="v">700 ✦</span></div>
+        <div class="rl"><span class="lv"><span class="h on">🏠</span><span class="h on">🏠</span><span class="h on">🏠</span></span><span class="nm">三級建築</span><span class="v">875 ✦</span></div>
+        <div class="rl"><span class="lv"><span class="h on">🏰</span></span><span class="nm">水晶城堡 · 滿級</span><span class="v">1,050 ✦</span></div>
+      </div>
+      <div class="meta-row">
+        <div class="mbox panel"><div class="ml">建造費 / 級</div><div class="mv">1,000 ✦</div></div>
+        <div class="mbox panel"><div class="ml">同色領地</div><div class="mv">2 / 2 已集齊</div></div>
+        <div class="mbox panel"><div class="ml">集齊加成</div><div class="mv">租金 ×2</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-gold" style="flex:1.5">購買領地 · 1,800 ✦</button>
+        <button class="btn btn-ghost">暫不購買</button>
+      </div>
+      <div class="wallet">你的金庫：<b>14,250 ✦</b> · 購買後剩餘 <b>12,450 ✦</b></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

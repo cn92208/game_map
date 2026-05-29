@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>主棋盤</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:1280px;height:800px;display:flex;gap:22px;padding:22px;overflow:hidden;}
+
+  /* ============ BOARD ============ */
+  .board-wrap{position:relative;flex:0 0 auto;width:756px;height:756px;}
+  .board{
+    position:absolute;inset:0;display:grid;
+    grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);
+    gap:5px;padding:14px;
+    background:
+      linear-gradient(150deg,rgba(40,30,72,.6),rgba(14,10,30,.75));
+    border-radius:24px;
+    border:1px solid var(--gold-line);
+    box-shadow:0 30px 70px -24px #000, inset 0 0 0 1px rgba(231,193,107,.08), inset 0 0 90px rgba(8,4,20,.7);
+  }
+  /* center map */
+  .map{
+    grid-column:2 / 11;grid-row:2 / 11;position:relative;border-radius:16px;overflow:hidden;
+    border:1px solid var(--gold-line);
+    box-shadow:inset 0 0 0 4px rgba(10,6,24,.6),0 0 50px rgba(110,80,160,.35);
+  }
+  .map img{width:100%;height:100%;object-fit:cover;opacity:.96;}
+  .map .map-veil{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,transparent 40%,rgba(8,4,20,.55));}
+  .map .crest{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:100%;
+  }
+  .map .crest .ring{
+    width:188px;height:188px;margin:0 auto;border-radius:50%;display:grid;place-items:center;
+    border:1px solid var(--gold-line);
+    background:radial-gradient(circle,rgba(12,8,26,.78),rgba(12,8,26,.35) 70%,transparent);
+    box-shadow:0 0 40px rgba(0,0,0,.5),inset 0 0 30px rgba(244,217,133,.12);
+  }
+  .map .crest .ring::before{content:'';position:absolute;width:214px;height:214px;border-radius:50%;
+    border:1px dashed rgba(231,193,107,.3);}
+  .map .crest h1{font-size:30px;line-height:1.15;}
+  .map .crest .sub{margin-top:4px;font-size:10px;}
+
+  /* ============ TILE ============ */
+  .tile{
+    position:relative;border-radius:9px;overflow:hidden;cursor:pointer;
+    background:#140f2b;border:1px solid rgba(231,193,107,.14);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);
+  }
+  .tile .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .tile .top-bar{position:absolute;top:0;left:0;right:0;height:5px;z-index:3;}
+  .tile .label{
+    position:absolute;left:0;right:0;bottom:0;z-index:4;padding:3px 2px 2px;
+    font-family:var(--serif);font-weight:700;font-size:7.4px;line-height:1.05;text-align:center;color:#f3e7cb;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    background:linear-gradient(to top,rgba(6,3,16,.94),rgba(6,3,16,.55) 70%,transparent);
+    text-shadow:0 1px 2px #000;
+  }
+  .tile .price{display:block;font-family:var(--display);font-weight:700;font-size:7px;color:var(--gold-2);letter-spacing:.02em;margin-top:1px;}
+  .tile .veil{position:absolute;inset:0;background:linear-gradient(160deg,rgba(20,12,40,.05),rgba(8,4,20,.35));z-index:1;}
+  /* corner tiles bigger emphasis */
+  .tile.corner .label{font-size:8.4px;}
+  /* owned glow */
+  .tile.owned{box-shadow:inset 0 0 0 1.5px var(--own),0 0 12px -2px var(--own);}
+  .tile .owner-gem{position:absolute;top:3px;right:3px;z-index:5;width:10px;height:10px;border-radius:50%;
+    border:1.5px solid #fff;box-shadow:0 0 6px #000;}
+  .tile .pips{position:absolute;top:6px;left:3px;z-index:5;display:flex;gap:1px;}
+  .tile .pips i{width:4px;height:5px;border-radius:1px;background:linear-gradient(var(--gold-1),var(--gold-3));box-shadow:0 0 3px #000;}
+  /* action medallion tiles (no building art) */
+  .tile.medallion{background:radial-gradient(circle at 50% 38%,#2a2150,#120c2c);display:grid;place-items:center;}
+  .tile.medallion .glyph{font-size:24px;filter:drop-shadow(0 2px 3px #000);z-index:2;margin-top:-6px;}
+  .tile.medallion::before{content:'';position:absolute;width:60%;height:60%;border-radius:50%;
+    border:1px solid rgba(231,193,107,.4);box-shadow:inset 0 0 14px rgba(244,217,133,.18);}
+
+  /* tokens on tile */
+  .tile .tokens{position:absolute;bottom:13px;left:0;right:0;z-index:6;display:flex;justify-content:center;gap:-4px;}
+  .tile .tokens img{width:24px;height:24px;object-fit:contain;margin:0 -5px;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.7));}
+  .tile .tokens img.active{filter:drop-shadow(0 0 6px var(--gold-2)) drop-shadow(0 3px 3px #000);}
+  .tile.here{box-shadow:inset 0 0 0 2px var(--gold-2),0 0 18px -2px var(--gold-glow);animation:tilepulse 1.8s ease-in-out infinite;}
+  @keyframes tilepulse{0%,100%{box-shadow:inset 0 0 0 2px var(--gold-2),0 0 14px -3px var(--gold-glow);}50%{box-shadow:inset 0 0 0 2px var(--gold-1),0 0 26px 0 var(--gold-glow);}}
+
+  /* ============ RIGHT RAIL ============ */
+  .rail{flex:1;min-width:0;display:flex;flex-direction:column;gap:13px;}
+  .rail-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;}
+  .rail-head .round{
+    font-family:var(--display);font-weight:700;font-size:12px;color:var(--gold-2);
+    border:1px solid var(--gold-line);border-radius:999px;padding:5px 14px;letter-spacing:.16em;white-space:nowrap;
+    background:rgba(12,8,26,.5);
+  }
+
+  /* current player spotlight */
+  .spot{padding:16px 18px;display:flex;gap:15px;align-items:center;position:relative;overflow:hidden;}
+  .spot::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 80% at 0% 0%,rgba(244,217,133,.14),transparent 55%);pointer-events:none;}
+  .spot .ava{position:relative;flex:0 0 auto;width:82px;height:82px;border-radius:16px;overflow:hidden;
+    border:1.5px solid var(--gold-line);background:radial-gradient(circle at 50% 30%,#2c2152,#120c2c);
+    box-shadow:0 0 22px rgba(244,217,133,.2),inset 0 0 0 1px rgba(0,0,0,.4);}
+  .spot .ava img{width:100%;height:100%;object-fit:contain;}
+  .spot .who{flex:1;min-width:0;}
+  .spot .who .nm{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--ink);}
+  .spot .who .arch{font-size:11px;color:var(--ink-dim);margin-top:1px;}
+  .spot .who .money{margin-top:9px;font-size:24px;}
+  .spot .who .money .amount{font-size:24px;}
+  .chips{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-dim);
+    background:rgba(12,8,26,.55);border:1px solid rgba(231,193,107,.18);border-radius:8px;padding:3px 9px;}
+  .chip b{color:var(--gold-2);font-family:var(--display);}
+
+  /* other players row */
+  .others{display:flex;gap:9px;}
+  .pcard{flex:1;min-width:0;padding:9px 8px 8px;text-align:center;position:relative;border-radius:13px;}
+  .pcard img{width:40px;height:40px;object-fit:contain;border-radius:50%;border:1.5px solid var(--pc);
+    background:rgba(12,8,26,.6);filter:drop-shadow(0 2px 3px #000);}
+  .pcard .pn{font-family:var(--serif);font-weight:700;font-size:11px;margin-top:4px;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pcard .pm{font-size:10.5px;color:var(--gold-2);font-family:var(--display);margin-top:1px;}
+  .pcard.jailed::after{content:'⛓';position:absolute;top:5px;right:7px;font-size:11px;}
+
+  /* landed property panel */
+  .landed{padding:0;overflow:hidden;}
+  .landed .lh{display:flex;align-items:stretch;gap:0;}
+  .landed .lh .pic{flex:0 0 96px;height:96px;position:relative;overflow:hidden;border-right:1px solid var(--gold-line);}
+  .landed .lh .pic img{width:100%;height:100%;object-fit:cover;}
+  .landed .lh .pic .rb{position:absolute;top:0;left:0;right:0;height:5px;}
+  .landed .lh .info{flex:1;padding:11px 14px;display:flex;flex-direction:column;justify-content:center;}
+  .landed .lh .info .reg{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink-dim);}
+  .landed .lh .info .nm{font-family:var(--serif);font-weight:900;font-size:19px;margin-top:2px;color:var(--ink);}
+  .landed .lh .info .st{font-size:11px;color:var(--ink-dim);margin-top:3px;}
+  .rent-row{display:flex;justify-content:space-between;padding:6px 16px;font-size:12px;border-top:1px solid rgba(231,193,107,.1);}
+  .rent-row:first-of-type{border-top:1px solid var(--gold-line);}
+  .rent-row .lbl{color:var(--ink-dim);}
+  .rent-row.cur{background:rgba(244,217,133,.08);}
+  .rent-row.cur .lbl{color:var(--gold-1);font-weight:700;}
+  .rent-row .v{font-family:var(--display);font-weight:600;color:var(--gold-2);}
+
+  /* dice + actions dock */
+  .dock{margin-top:auto;padding:15px 18px;display:flex;flex-direction:column;gap:13px;}
+  .dice-cast{display:flex;align-items:center;gap:16px;}
+  .casting-circle{position:relative;flex:0 0 auto;width:120px;height:96px;display:grid;place-items:center;}
+  .casting-circle::before{content:'';position:absolute;width:96px;height:96px;border-radius:50%;
+    border:1px dashed rgba(231,193,107,.35);box-shadow:inset 0 0 24px rgba(244,217,133,.12);}
+  .dice-pair{display:flex;gap:9px;}
+  .die{width:42px;height:42px;border-radius:10px;position:relative;
+    background:linear-gradient(150deg,#fbf3df,#e6d3a6);
+    box-shadow:0 6px 14px rgba(0,0,0,.5),inset 0 2px 2px rgba(255,255,255,.7),inset 0 -3px 4px rgba(150,110,40,.35);}
+  .die i{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 35% 30%,#4a2f12,#1c1106);box-shadow:inset 0 1px 1px rgba(0,0,0,.6);}
+  .dock .actions{display:flex;gap:10px;}
+  .dock .actions .btn{flex:1;}
+
+  /* event log */
+  .log{padding:11px 16px;max-height:96px;overflow:hidden;}
+  .log .lt{font-family:var(--display);font-size:10px;letter-spacing:.3em;color:var(--gold-3);margin-bottom:7px;}
+  .log .li{display:flex;gap:7px;font-size:11.5px;color:var(--ink-dim);padding:3px 0;line-height:1.3;}
+  .log .li .ic{flex:0 0 auto;}
+  .log .li b{color:var(--ink);font-weight:700;}
+  .log .li .g{color:var(--gain);}
+  .log .li .l{color:var(--loss);}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="主棋盤">
+
+  <!-- ============ BOARD ============ -->
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <div class="map">
+        <img src="../images/background_map.png" alt="Ilumiya">
+        <div class="map-veil"></div>
+        <div class="crest">
+          <div class="ring">
+            <div>
+              <h1 class="title-zh">奇幻<br>大富翁</h1>
+            </div>
+          </div>
+          <div class="sub eyebrow">CONTINENT&nbsp;OF&nbsp;ILUMIYA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT RAIL ============ -->
+  <div class="rail">
+    <div class="rail-head panel flourish">
+      <div>
+        <div class="eyebrow">Fantasy&nbsp;Monopoly</div>
+        <div class="title-zh" style="font-size:26px;line-height:1;margin-top:3px;">伊路米雅</div>
+      </div>
+      <div class="round">第 7 回合</div>
+    </div>
+
+    <!-- current player spotlight -->
+    <div class="spot panel flourish" style="--c:var(--shadow)">
+      <div class="ava"><img src="../images/q_mage.png" alt=""></div>
+      <div class="who">
+        <div class="nm">星辰・Lyra</div>
+        <div class="arch">🔮 元素法師 · 操控命運之力</div>
+        <div class="money"><span class="amount">14,250</span> <span class="coin"></span></div>
+        <div class="chips">
+          <span class="chip">領地 <b>4</b></span>
+          <span class="chip">道具 <b>2</b></span>
+          <span class="chip">護盾 <b>1</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- other players -->
+    <div class="others">
+      <div class="pcard panel" style="--pc:var(--fire)"><img src="../images/q_paladin.png" alt=""><div class="pn">凱爾</div><div class="pm">21,800<span class="coin" style="font-size:8px"></span></div></div>
+      <div class="pcard panel jailed" style="--pc:var(--enchanted)"><img src="../images/q_druid.png" alt=""><div class="pn">薇拉</div><div class="pm">9,600<span class="coin" style="font-size:8px"></span></div></div>
+      <div class="pcard panel" style="--pc:var(--giant)"><img src="../images/q_engineer.png" alt=""><div class="pn">格倫</div><div class="pm">12,400<span class="coin" style="font-size:8px"></span></div></div>
+    </div>
+
+    <!-- landed property -->
+    <div class="landed panel flourish">
+      <div class="lh">
+        <div class="pic"><span class="rb" style="background:var(--crystal)"></span><img src="../images/tile_property.png" alt=""></div>
+        <div class="info">
+          <div class="reg"><span class="gem" style="color:var(--crystal);background:var(--crystal)"></span> 水晶洞窟 · 無人擁有</div>
+          <div class="nm">水晶洞穴</div>
+          <div class="st">你停在了一片待開發的寶地</div>
+        </div>
+      </div>
+      <div class="rent-row cur"><span class="lbl">基本租金 ◂ 目前</span><span class="v">90 ✦</span></div>
+      <div class="rent-row"><span class="lbl">🏠 一級建築</span><span class="v">250 ✦</span></div>
+      <div class="rent-row"><span class="lbl">🏰 城堡（滿級）</span><span class="v">1,050 ✦</span></div>
+    </div>
+
+    <!-- dock -->
+    <div class="dock panel flourish">
+      <div class="dice-cast">
+        <div class="casting-circle">
+          <div class="dice-pair">
+            <div class="die" data-v="4"></div>
+            <div class="die" data-v="3"></div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="eyebrow" style="font-size:10px">擲出 4 + 3 = 7</div>
+          <div class="t-serif" style="font-size:15px;color:var(--ink);margin-top:3px;">前進七步，抵達水晶洞穴</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-gold btn-sm" style="flex:1.4">購買領地 · 1,800 ✦</button>
+        <button class="btn btn-ghost btn-sm">道具背包</button>
+        <button class="btn btn-ghost btn-sm">結束回合</button>
+      </div>
+    </div>
+
+    <!-- log -->
+    <div class="log panel">
+      <div class="lt">ADVENTURE&nbsp;LOG</div>
+      <div class="li"><span class="ic">🏰</span><span><b>凱爾</b> 經過起始城堡，獲得 <span class="g">2,000 ✦</span></span></div>
+      <div class="li"><span class="ic">💰</span><span><b>格倫</b> 支付 <span class="l">450 ✦</span> 租金給 <b>凱爾</b></span></div>
+      <div class="li"><span class="ic">🪤</span><span><b>薇拉</b> 被龍捕手抓進龍穴</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REGION={enchanted:'魔法森林',shadow:'暗影之域',fire:'烈焰之地',crystal:'水晶洞窟',giant:'巨人高原',frost:'冰霜峽谷',sacred:'神聖殿堂',storm:'暴風之境',ancient:'上古聖域'};
+const BOARD=[
+ {t:'special',n:'起始城堡',img:'tile_special',glyph:'🏰',corner:1},
+ {t:'property',n:'精靈森林',g:'enchanted',price:600},
+ {t:'chance',n:'機會之門',img:'tile_chance'},
+ {t:'property',n:'矮人礦坑',g:'enchanted',price:600},
+ {t:'property',n:'荒野草原',g:'enchanted',price:800},
+ {t:'tax',n:'魔法稅',glyph:'💎'},
+ {t:'transport',n:'飛龍驛站',img:'tile_railway',price:2000},
+ {t:'property',n:'暗影沼澤',g:'shadow',price:1000},
+ {t:'destiny',n:'命運神殿',img:'tile_destiny'},
+ {t:'property',n:'月光草原',g:'shadow',price:1000},
+ {t:'special',n:'龍穴',img:'tile_special',glyph:'🐉',corner:1},
+ {t:'curse',n:'詛咒廢墟',glyph:'💀'},
+ {t:'property',n:'鳳凰塔',g:'fire',price:1400},
+ {t:'minigame',n:'競技場',glyph:'⚔️'},
+ {t:'property',n:'天使港灣',g:'fire',price:1400},
+ {t:'chance',n:'機會之門',img:'tile_chance'},
+ {t:'property',n:'熔岩峽谷',g:'fire',price:1600},
+ {t:'stock',n:'股票交易所',glyph:'📈'},
+ {t:'property',n:'水晶洞穴',g:'crystal',price:1800,here:1},
+ {t:'tavern',n:'冒險者酒館',glyph:'🍺'},
+ {t:'property',n:'獨角獸牧場',g:'crystal',price:1800,corner:1},
+ {t:'free',n:'魔法泉源',glyph:'⛲'},
+ {t:'property',n:'巨人城堡',g:'giant',price:2200},
+ {t:'destiny',n:'命運神殿',img:'tile_destiny'},
+ {t:'property',n:'暗黑森林',g:'giant',price:2200},
+ {t:'shop',n:'道具商店',glyph:'🏪'},
+ {t:'auction',n:'拍賣廳',glyph:'🔔'},
+ {t:'property',n:'冰霜峽谷',g:'frost',price:2600},
+ {t:'transport',n:'飛天掃帚站',img:'tile_railway',price:2000},
+ {t:'property',n:'龍焰烈地',g:'frost',price:2600},
+ {t:'minigame',n:'競技場',glyph:'⚔️',corner:1},
+ {t:'special',n:'龍捕手',glyph:'🪤'},
+ {t:'property',n:'星光神殿',g:'sacred',price:3500},
+ {t:'chance',n:'機會之門',img:'tile_chance'},
+ {t:'property',n:'魔王城堡',g:'sacred',price:4000},
+ {t:'property',n:'暴風峽谷',g:'storm',price:3200},
+ {t:'shop',n:'道具商店',glyph:'🏪'},
+ {t:'transport',n:'星際傳送門',img:'tile_railway',price:2000},
+ {t:'property',n:'雷霆高地',g:'storm',price:3200},
+ {t:'property',n:'上古龍廟',g:'ancient',price:5000},
+];
+// owners for the mock: idx -> {color, level}
+const OWN={1:{c:'enchanted',lv:0},3:{c:'enchanted',lv:1},7:{c:'shadow',lv:2},12:{c:'fire',lv:0},
+ 14:{c:'fire',lv:3},22:{c:'giant',lv:1},27:{c:'frost',lv:0},34:{c:'sacred',lv:2},39:{c:'ancient',lv:1}};
+// tokens on board: idx -> [{img,active}]
+const TOKENS={18:[{img:'q_mage',active:1}],10:[{img:'q_druid'}],3:[{img:'q_paladin'}],32:[{img:'q_engineer'}]};
+
+function gpos(i){
+  if(i<=10) return {c:i+1,r:1};
+  if(i<=20) return {c:11,r:i-10+1};
+  if(i<=30) return {c:30-i+1,r:11};
+  return {c:1,r:40-i+1};
+}
+const board=document.getElementById('board');
+BOARD.forEach((sp,i)=>{
+  const p=gpos(i);
+  const el=document.createElement('div');
+  el.className='tile'+(sp.corner?' corner':'')+(sp.here?' here':'');
+  el.style.gridColumn=p.c; el.style.gridRow=p.r;
+  const own=OWN[i];
+  const hasArt = sp.t==='property'||sp.t==='transport'||sp.t==='chance'||sp.t==='destiny'||sp.t==='special';
+  let html='';
+  if(hasArt){
+    const img = sp.img || 'tile_property';
+    html += `<img class="art" src="../images/${img}.png" alt=""><div class="veil"></div>`;
+    if(sp.g) html += `<span class="top-bar" style="background:var(--${sp.g})"></span>`;
+  } else {
+    el.classList.add('medallion');
+    html += `<div class="glyph">${sp.glyph||'✦'}</div>`;
+  }
+  if(own){
+    el.classList.add('owned'); el.style.setProperty('--own',`var(--${own.c})`);
+    html += `<span class="owner-gem" style="background:var(--${own.c})"></span>`;
+    if(own.lv>0){ html += `<div class="pips">`+ '<i></i>'.repeat(own.lv) +`</div>`; }
+  }
+  // label
+  let label = `<div class="label">${sp.n}`;
+  if(sp.price) label += `<span class="price">${sp.price.toLocaleString()} ✦</span>`;
+  label += `</div>`;
+  html += label;
+  // tokens
+  if(TOKENS[i]){
+    html += `<div class="tokens">`+ TOKENS[i].map(t=>`<img class="${t.active?'active':''}" src="../images/${t.img}.png">`).join('') +`</div>`;
+  }
+  el.innerHTML=html;
+  board.appendChild(el);
+});
+
+// dice pips
+const PIP={1:[[50,50]],2:[[28,28],[72,72]],3:[[26,26],[50,50],[74,74]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[26,26],[74,26],[50,50],[26,74],[74,74]],6:[[28,24],[72,24],[28,50],[72,50],[28,76],[72,76]]};
+document.querySelectorAll('.die').forEach(d=>{
+  const v=+d.dataset.v;
+  PIP[v].forEach(([x,y])=>{const i=document.createElement('i');i.style.left=x+'%';i.style.top=y+'%';d.appendChild(i);});
+});
+</script>
+</body>
+</html>

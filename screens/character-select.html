@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>角色選擇</title>
+<link rel="stylesheet" href="../styles/ilumiya.css">
+<style>
+  .screen{position:relative;width:1280px;height:800px;overflow:hidden;display:flex;}
+  /* hero stage */
+  .stage{position:absolute;inset:0;}
+  .stage .hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 30%;}
+  .stage .veil{position:absolute;inset:0;background:
+    linear-gradient(100deg,rgba(8,5,18,.96) 24%,rgba(8,5,18,.6) 44%,rgba(8,5,18,.15) 66%,rgba(8,5,18,.55) 100%),
+    radial-gradient(120% 90% at 70% 110%,rgba(8,5,18,.85),transparent 60%);}
+  .stage .topfade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,5,18,.7),transparent 18%,transparent 80%,rgba(8,5,18,.85));}
+
+  /* left roster */
+  .roster{position:relative;z-index:3;width:392px;flex:0 0 auto;height:100%;padding:34px 26px 26px 34px;display:flex;flex-direction:column;}
+  .brand{margin-bottom:6px;}
+  .brand .eyebrow{font-size:11px;}
+  .brand h1{font-size:40px;line-height:1.02;margin-top:5px;}
+  .brand .tag{font-family:var(--display);font-size:12px;letter-spacing:.34em;color:var(--ink-dim);margin-top:7px;text-transform:uppercase;}
+  .pick-h{display:flex;align-items:center;gap:10px;margin:20px 0 12px;}
+  .pick-h .eyebrow{white-space:nowrap;}
+  .pick-h .rule-gold{flex:1;}
+  .list{display:flex;flex-direction:column;gap:7px;overflow:hidden;}
+  .row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;cursor:pointer;position:relative;
+    border:1px solid transparent;transition:.2s;}
+  .row:hover{background:rgba(255,255,255,.04);}
+  .row .tk{width:42px;height:42px;flex:0 0 auto;border-radius:50%;object-fit:contain;
+    background:radial-gradient(circle at 50% 30%,#2c2152,#120c2c);border:1.5px solid rgba(231,193,107,.3);
+    filter:drop-shadow(0 2px 3px #000);}
+  .row .meta .zh{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--ink);}
+  .row .meta .en{font-family:var(--display);font-size:9.5px;letter-spacing:.22em;color:var(--ink-faint);text-transform:uppercase;margin-top:1px;}
+  .row .spec{margin-left:auto;font-size:10.5px;color:var(--ink-dim);text-align:right;}
+  .row.sel{background:linear-gradient(100deg,rgba(244,217,133,.16),rgba(244,217,133,.02));border-color:var(--gold-line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 22px -6px var(--gold-glow);}
+  .row.sel .tk{border-color:var(--gold-2);box-shadow:0 0 12px var(--gold-glow);}
+  .row.sel .spec{color:var(--gold-2);}
+  .row .taken{position:absolute;right:12px;font-size:10px;color:var(--ink-faint);}
+  .row.taken-row{opacity:.45;}
+  .row.taken-row .tk{filter:grayscale(.7) drop-shadow(0 2px 3px #000);}
+
+  /* center: big token + detail */
+  .focus{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:30px 38px 28px;}
+  .big-token{position:absolute;top:54px;left:50%;transform:translateX(-58%);width:330px;height:330px;}
+  .big-token img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 26px 30px rgba(0,0,0,.7)) drop-shadow(0 0 40px rgba(157,107,230,.4));}
+  .big-token .halo{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;
+    background:radial-gradient(circle,rgba(157,107,230,.3),transparent 62%);filter:blur(8px);z-index:-1;}
+  .ped{position:absolute;left:50%;bottom:212px;transform:translateX(-58%);width:200px;height:34px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(244,217,133,.35),transparent 70%);filter:blur(4px);}
+
+  .detail{position:relative;}
+  .detail .name-row{display:flex;align-items:flex-end;gap:14px;}
+  .detail h2{font-family:var(--serif);font-weight:900;font-size:46px;line-height:1;color:var(--ink);text-shadow:0 3px 18px rgba(0,0,0,.7);}
+  .detail .en2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.28em;color:var(--gold-3);text-transform:uppercase;padding-bottom:7px;}
+  .detail .quote{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-dim);margin-top:12px;max-width:560px;
+    border-left:2px solid var(--gold-line);padding-left:14px;line-height:1.5;}
+  .ability-grid{display:flex;gap:11px;margin-top:18px;}
+  .ab{flex:1;padding:12px 14px;}
+  .ab .ah{display:flex;align-items:center;gap:7px;font-family:var(--serif);font-weight:700;font-size:13.5px;color:var(--gold-2);}
+  .ab .ad{font-size:11.5px;color:var(--ink-dim);margin-top:5px;line-height:1.45;}
+  .ab .weak{color:var(--loss);}
+
+  /* bottom bar: count + start */
+  .startbar{display:flex;align-items:center;gap:18px;margin-top:22px;}
+  .counts{display:flex;align-items:center;gap:9px;}
+  .counts .lbl{font-family:var(--display);font-size:10px;letter-spacing:.28em;color:var(--ink-dim);text-transform:uppercase;}
+  .cbtn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;cursor:pointer;
+    font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink-dim);
+    background:rgba(12,8,26,.6);border:1px solid rgba(231,193,107,.2);transition:.2s;}
+  .cbtn.on{color:#2a1c05;background:linear-gradient(176deg,var(--gold-1),var(--gold-3));border-color:var(--gold-2);box-shadow:0 0 14px var(--gold-glow);}
+  .startbar .btn{margin-left:auto;font-size:18px;padding:16px 44px;}
+</style>
+</head>
+<body class="void-bg">
+<div class="screen" data-screen-label="角色選擇">
+  <div class="stage">
+    <img class="hero" id="hero" src="../images/hero_mage.png" alt="">
+    <div class="veil"></div>
+    <div class="topfade"></div>
+  </div>
+
+  <!-- roster -->
+  <div class="roster">
+    <div class="brand">
+      <div class="eyebrow">Fantasy&nbsp;Monopoly&nbsp;·&nbsp;Ilumiya</div>
+      <h1 class="title-zh">選擇你的<br>英雄</h1>
+      <div class="tag">Choose&nbsp;Your&nbsp;Champion</div>
+    </div>
+    <div class="pick-h"><span class="eyebrow">Eight&nbsp;Archetypes</span><hr class="rule-gold"></div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <!-- focus -->
+  <div class="focus">
+    <div class="ped"></div>
+    <div class="big-token"><div class="halo"></div><img id="bigtoken" src="../images/q_mage.png" alt=""></div>
+    <div class="detail">
+      <div class="name-row">
+        <h2 id="dname">元素法師</h2>
+        <div class="en2" id="den">Elemental&nbsp;Mage</div>
+      </div>
+      <div class="quote" id="dquote">「萬物皆有其根本；掌握根本者，掌握一切。」</div>
+      <div class="ability-grid" id="abilities"></div>
+      <div class="startbar">
+        <div class="counts">
+          <span class="lbl">玩家人數</span>
+          <div class="cbtn" data-n="2">2</div>
+          <div class="cbtn on" data-n="3">3</div>
+          <div class="cbtn" data-n="4">4</div>
+          <div class="cbtn" data-n="5">5</div>
+          <div class="cbtn" data-n="6">6</div>
+        </div>
+        <button class="btn btn-gold">開始冒險 ⚔</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CH=[
+ {id:'mage',zh:'元素法師',en:'Elemental Mage',spec:'操控命運',color:'crystal',hero:'hero_mage',
+  q:'「萬物皆有其根本；掌握根本者，掌握一切。」',
+  ab:[['🎲 元素偏轉','每局三次，可重新擲骰一次'],['🔒 地脈封印','使地塊兩名訪客多付 50% 過路費'],['◆ 四象共鳴','依骰子點數觸發火水土風效果']],
+  weak:'金幣低於 100 時，所有能力減弱'},
+ {id:'paladin',zh:'聖焰騎士',en:'Holy Flame Paladin',spec:'守護・折扣',color:'fire',hero:'hero_paladin',
+  q:'「以光芒驅散黑暗，以誓言守護弱者。」',
+  ab:[['🛡 聖盾壁壘','連續三回合不觸發負面機會牌'],['✦ 神聖光環','聖域系過路費享 75 折優惠'],['⚖ 誓言結界','下一次入獄可免費出獄']],
+  weak:'對混沌系效果的抵抗力較低'},
+ {id:'druid',zh:'翠林德魯伊',en:'Verdant Druid',spec:'被動收入',color:'enchanted',hero:'hero_druid',
+  q:'「自然不欠任何人，但她會回饋懂得聆聽的心。」',
+  ab:[['🌱 種植利息','森林系領地每回合產生被動收益'],['🦌 動物使者','派遣使者代收遠方租金'],['🍃 自然回饋','經過泉源恢復並獲得補給']],
+  weak:'城市核心地塊收益降低 50%'},
+ {id:'engineer',zh:'蒸汽工匠',en:'Steam Artificer',spec:'建造・機械',color:'giant',hero:'hero_engineer',
+  q:'「給我齒輪與蒸汽，我就能撐起一座城。」',
+  ab:[['🔧 快速建造','建造費用享八折，可連續升級'],['⚙ 自動收益','機械工坊每回合自動產金'],['💥 機關陷阱','在領地佈署陷阱懲罰入侵者']],
+  weak:'魔法系效果對其影響加倍'},
+ {id:'overlord',zh:'暗夜霸主',en:'Nightfall Overlord',spec:'統御・壓制',color:'storm',hero:'hero_overlord',
+  q:'「跪下，或被征服——這是唯一的選擇。」',
+  ab:[['👑 威壓徵稅','對相鄰玩家額外徵收貢金'],['🦇 暗影軍團','召喚軍團佔領無主地塊'],['☄ 霸主之威','降低全場對手的擲骰上限']],
+  weak:'破產時懲罰加重，財產加速流失'},
+ {id:'ranger',zh:'星海遊俠',en:'Star Sea Ranger',spec:'機動・精準',color:'crystal',hero:'hero_ranger',
+  q:'「箭矢所指，便是命運落點。」',
+  ab:[['🎯 精準移動','可微調擲骰結果 ±1 步'],['🌌 星圖導航','傳送至任一已擁有的領地'],['🏹 遠程狙擊','跨格收取一次額外過路費']],
+  weak:'停留同一地塊過久會失去增益'},
+ {id:'assassin',zh:'暗影刺客',en:'Shadow Assassin',spec:'竊取・情報',color:'shadow',hero:'hero_assassin',
+  q:'「我不在黑暗中——我就是黑暗本身。」',
+  ab:[['👣 潛行踏步','移動時可略過最多 2 格的過路費'],['📜 影契約','出售免過路費通行證並收費'],['🗡 奪命竊取','一局兩次，奪取領先者 500 金幣']],
+  weak:'在開放廣場類地塊效果減半'},
+ {id:'warlock',zh:'混沌術士',en:'Chaos Warlock',spec:'混沌・詛咒',color:'storm',hero:'hero_warlock',
+  q:'「秩序是幻覺，唯有混沌永恆。」',
+  ab:[['🌀 混沌詛咒','使目標地塊規則隨機翻轉'],['🪬 靈魂契約','以金幣交換對手一回合行動權'],['🔮 命運扭曲','將機會與命運牌互相轉換']],
+  weak:'自身亦可能被混沌反噬'}
+];
+const TAKEN={paladin:'凱爾',druid:'薇拉',engineer:'格倫'}; // 其他玩家已選
+let sel='mage';
+
+const list=document.getElementById('list');
+CH.forEach(c=>{
+  const r=document.createElement('div');
+  const taken=TAKEN[c.id];
+  r.className='row'+(c.id===sel?' sel':'')+(taken?' taken-row':'');
+  r.innerHTML=`<img class="tk" src="../images/q_${c.id}.png">
+    <div class="meta"><div class="zh">${c.zh}</div><div class="en">${c.en}</div></div>
+    <div class="spec">${taken?('已選・'+taken):c.spec}</div>`;
+  r.onclick=()=>{ if(taken)return; sel=c.id; render(); };
+  list.appendChild(r);
+});
+function render(){
+  const c=CH.find(x=>x.id===sel);
+  document.querySelectorAll('.row').forEach((r,i)=>r.classList.toggle('sel',CH[i].id===sel));
+  document.getElementById('hero').src='../images/'+c.hero+'.png';
+  document.getElementById('bigtoken').src='../images/q_'+c.id+'.png';
+  document.getElementById('dname').textContent=c.zh;
+  document.getElementById('den').textContent=c.en;
+  document.getElementById('dquote').textContent=c.q;
+  document.querySelector('.big-token img').style.filter=
+    `drop-shadow(0 26px 30px rgba(0,0,0,.7)) drop-shadow(0 0 40px var(--${c.color}))`;
+  document.querySelector('.halo').style.background=`radial-gradient(circle,var(--${c.color}),transparent 62%)`;
+  document.querySelector('.halo').style.opacity='.34';
+  const ab=document.getElementById('abilities');
+  ab.innerHTML=c.ab.map(a=>`<div class="ab panel flourish"><div class="ah">${a[0]}</div><div class="ad">${a[1]}</div></div>`).join('')
+    +`<div class="ab panel" style="flex:.9"><div class="ah weak">⚠ 致命弱點</div><div class="ad">${c.weak}</div></div>`;
+}
+render();
+document.querySelectorAll('.cbtn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.cbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+});
+</script>
+</body>
+</html>
